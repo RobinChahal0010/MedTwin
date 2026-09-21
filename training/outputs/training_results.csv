@@ -1,0 +1,5 @@
+metric,value
+test_roc_auc,0.6591636654661865
+test_brier_score,0.23306518579527769
+cv_mean_roc_auc,0.7301705795376682
+cv_std_roc_auc,0.023351241662618358

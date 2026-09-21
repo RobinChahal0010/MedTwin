@@ -1,0 +1,98 @@
+{
+    "baseline": {
+        "inputs": {
+            "RIDAGEYR": 52,
+            "RIAGENDR": 1,
+            "BMXBMI": 28.4,
+            "BPXOSY1": 138.0,
+            "BPXODI1": 86.0,
+            "LBXTC": 190.0,
+            "LBDHDD": 45.0,
+            "LBXSCR": 0.9,
+            "DIQ050": 0
+        },
+        "probability": 0.955175,
+        "percentile": ">99"
+    },
+    "scenarios": [
+        {
+            "name": "Improved metabolic profile",
+            "inputs": {
+                "RIDAGEYR": 52,
+                "RIAGENDR": 1,
+                "BMXBMI": 25.0,
+                "BPXOSY1": 125.0,
+                "BPXODI1": 80.0,
+                "LBXTC": 175.0,
+                "LBDHDD": 52.0,
+                "LBXSCR": 0.9,
+                "DIQ050": 0
+            },
+            "probability": 0.950492,
+            "percentile": ">99",
+            "change_percentage_points": -0.4684,
+            "changed_variables": {
+                "BMXBMI": {
+                    "from": 28.4,
+                    "to": 25.0
+                },
+                "BPXOSY1": {
+                    "from": 138.0,
+                    "to": 125.0
+                },
+                "BPXODI1": {
+                    "from": 86.0,
+                    "to": 80.0
+                },
+                "LBXTC": {
+                    "from": 190.0,
+                    "to": 175.0
+                },
+                "LBDHDD": {
+                    "from": 45.0,
+                    "to": 52.0
+                }
+            }
+        },
+        {
+            "name": "higher risk input scenario",
+            "inputs": {
+                "RIDAGEYR": 52,
+                "RIAGENDR": 1,
+                "BMXBMI": 30.0,
+                "BPXOSY1": 150.0,
+                "BPXODI1": 95.0,
+                "LBXTC": 220.0,
+                "LBDHDD": 40.0,
+                "LBXSCR": 0.9,
+                "DIQ050": 0
+            },
+            "probability": 0.961642,
+            "percentile": ">99",
+            "change_percentage_points": 0.6466,
+            "changed_variables": {
+                "BMXBMI": {
+                    "from": 28.4,
+                    "to": 30.0
+                },
+                "BPXOSY1": {
+                    "from": 138.0,
+                    "to": 150.0
+                },
+                "BPXODI1": {
+                    "from": 86.0,
+                    "to": 95.0
+                },
+                "LBXTC": {
+                    "from": 190.0,
+                    "to": 220.0
+                },
+                "LBDHDD": {
+                    "from": 45.0,
+                    "to": 40.0
+                }
+            }
+        }
+    ],
+    "disclaimer": "These are model-based population-pattern estimates from modified input values. They are not medical diagnoses or personal medical forecasts."
+}
