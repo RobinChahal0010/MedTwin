@@ -2,3 +2,7 @@ training/data/
 __pycache__/
 *.pyc
 .env
+<<<<<<< HEAD
+=======
+venv/
+>>>>>>> 464c828349aa4a4b3477d48c3a2c56a2be7f7019
