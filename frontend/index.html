@@ -1,23 +1,11 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>MidTwin — Understand your sugar health</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-<div id="app"></div>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 44 40">
-  <circle cx="17" cy="20" r="12.2" fill="none" stroke="currentColor" stroke-width="2.5"/>
-  <circle cx="27" cy="20" r="12.2" fill="none" stroke="currentColor" stroke-width="2.5" opacity=".34"/>
-  <path d="M5.5 20h6.8l3-7.4 4.6 14.6 3.6-9.4 2.5 4.2H38.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-</symbol></svg>
-
-<script src="js/app.js"></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MedTwin – Understand your sugar health</title><link rel="stylesheet" href="css/style.css"></head><body>
+<main class="center">
+<div><h1>Understand your sugar health, simply.</h1>
+<p class="mute" style="margin-top:16px;font-size:1.2rem;max-width:620px">Type in your lab numbers. See where you stand in easy words. Ask any question, in English or हिन्दी.</p></div>
+<form class="card login" id="f"><h2 style="margin-bottom:14px">Sign in</h2>
+<label for="u">Username</label><input id="u" value="demo" autocomplete="username">
+<label for="p" style="display:block;margin-top:10px">Password</label><input id="p" type="password" value="demo" autocomplete="current-password">
+<button class="btn wide" style="margin-top:16px">Continue</button><span class="hint" style="margin:10px 0 0;text-align:center">Demo: username and password are both “demo”.</span></form>
+<div class="steps"><div class="card"><b>1. Add your numbers</b><p class="mute">From your lab report, or type them in.</p></div><div class="card"><b>2. See your health picture</b><p class="mute">Green means on target. Orange means talk to your doctor.</p></div><div class="card"><b>3. Ask anything</b><p class="mute">Type or speak, in English or हिन्दी.</p></div></div>
+</main><script src="js/api.js"></script><script src="js/cursor.js"></script><script src="js/ui.js"></script>
+<script>f.onsubmit=async e=>{e.preventDefault();const r=await API.login(u.value,p.value);if(r.ok||r.patient_id){localStorage.pid=r.patient_id||'demo';location='upload.html'}}</script></body></html>
