@@ -1,0 +1,7 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My health</title><link rel="stylesheet" href="css/style.css"></head><body>
+<main><h1 style="font-size:clamp(2rem,5vw,3rem)">Your health picture</h1><p class="mute">Green = on target. Orange = a good thing to talk about with your doctor.</p>
+<div class="grid" style="grid-template-columns:minmax(260px,340px) 1fr;margin-top:22px">
+<div class="card" style="text-align:center"><svg viewBox="0 0 120 120" width="210"><circle cx="60" cy="60" r="52" fill="none" stroke="#dff1e4" stroke-width="10"/><circle id="arc" cx="60" cy="60" r="52" fill="none" stroke="#2f9e6e" stroke-width="10" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1)"/></svg>
+<div class="big" style="margin-top:-125px;margin-bottom:75px"><span id="r">0</span>%</div><p class="mute">Chance your sugar is above the usual goal. This is an estimate from many people’s data, not a diagnosis.</p><br><a class="btn" href="chat.html">Ask a question</a></div>
+<div class="grid" id="vals"></div></div></main>
+<script src="js/api.js"></script><script src="js/cursor.js"></script><script src="js/ui.js"></script><script src="js/twin.js"></script></body></html>

@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ask a question</title><link rel="stylesheet" href="css/style.css"></head><body>
+<main><div class="row" style="justify-content:space-between"><h1 style="font-size:clamp(2rem,5vw,3rem)">Ask me anything</h1>
+<div class="row"><button class="chip" id="lang">🌐 English</button><button class="chip" id="voice">🔈 Read answers aloud: off</button><button class="chip" id="md">Style: Simple words</button></div></div>
+<p class="mute" style="margin:6px 0 10px">Type or tap the mic and speak, in English or हिन्दी.</p>
+<div class="pipe" id="pp"></div>
+<div class="card"><div id="msgs"></div><div class="row" id="sugg" style="margin:12px 0"></div>
+<form id="f" class="row"><input id="q" placeholder="Type your question here…" style="flex:1;margin:0" aria-label="Your question"><button type="button" class="chip" id="mic">🎙 Speak</button><button class="btn">Send</button></form></div></main>
+<script src="js/api.js"></script><script src="js/cursor.js"></script><script src="js/ui.js"></script><script src="js/chat.js"></script></body></html>
