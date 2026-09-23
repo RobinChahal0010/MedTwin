@@ -233,10 +233,14 @@ async function submitQuestion(questionText: string) {
               accumulatedText = data.text;
               contentEl.innerHTML = renderMarkdownSimple(data.text);
             } else if (data.type === 'result') {
-              if (data.sources) {
+              if (typeof data.answer === 'string' && data.answer.trim()) {
+                accumulatedText = data.answer;
+                contentEl.innerHTML = renderMarkdownSimple(data.answer);
+              }
+              if (Array.isArray(data.sources)) {
                 sources = data.sources;
               }
-              if (typeof data.confidence === 'number') {
+              if (typeof data.confidence === 'number' && Number.isFinite(data.confidence)) {
                 confidence = data.confidence;
               }
             }
@@ -247,44 +251,62 @@ async function submitQuestion(questionText: string) {
       }
     }
 
-    markCompleted();
+    try {
+      const safeAnswer = (typeof accumulatedText === 'string' && accumulatedText.trim())
+        ? accumulatedText
+        : 'No answer returned from the clinical reasoning pipeline.';
 
-    // Render metadata, sources accordion, and optional read aloud button
-    let metaHtml = '';
-    if (sources && sources.length > 0) {
-      const sourceListHtml = sources
-        .map(
-          (s) => `
-        <div style="font-size: 0.8rem; margin-top: 4px; padding: 4px 8px; background: rgba(0,0,0,0.04); border-radius: 6px;">
-          <b>${s.doc}</b> ${s.sec ? `(${s.sec})` : ''}: <span>${s.text}</span>
-        </div>
-      `
-        )
-        .join('');
-      metaHtml += `
-        <details style="margin-top: 10px; font-size: 0.84rem; cursor: pointer;">
-          <summary style="font-weight: 600; color: var(--forest);">Verified Clinical Guidelines (${sources.length})</summary>
-          <div style="margin-top: 6px;">${sourceListHtml}</div>
-        </details>
-      `;
-    }
+      if (!contentEl.innerHTML || contentEl.innerHTML.trim() === '' || contentEl.innerHTML === '<span class="mute" style="font-size: 0.88rem;">Consulting 6-agent clinical reasoning pipeline...</span>') {
+        contentEl.innerHTML = renderMarkdownSimple(safeAnswer);
+      }
 
-    if (typeof confidence === 'number') {
-      const confPct = Math.round(confidence * 100);
-      metaHtml += `
-        <div style="margin-top: 10px;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 3px;">
-            <span class="mute">Evidence Grounding</span>
-            <span style="font-weight: 600; color: var(--forest);">${confPct}%</span>
+      markCompleted();
+
+      // Render metadata, sources accordion, and optional read aloud button
+      let metaHtml = '';
+      if (Array.isArray(sources) && sources.length > 0) {
+        const sourceListHtml = sources
+          .map((s) => {
+            const doc = s && typeof s.doc === 'string' ? s.doc : 'Clinical source';
+            const sec = s && typeof s.sec === 'string' ? s.sec : '';
+            const text = s && typeof s.text === 'string' ? s.text : '';
+            return `
+              <div style="font-size: 0.8rem; margin-top: 4px; padding: 4px 8px; background: rgba(0,0,0,0.04); border-radius: 6px;">
+                <b>${doc}</b> ${sec ? `(${sec})` : ''}: <span>${text}</span>
+              </div>
+            `;
+          })
+          .join('');
+
+        metaHtml += `
+          <details style="margin-top: 10px; font-size: 0.84rem; cursor: pointer;">
+            <summary style="font-weight: 600; color: var(--forest);">Verified Clinical Guidelines (${sources.length})</summary>
+            <div style="margin-top: 6px;">${sourceListHtml}</div>
+          </details>
+        `;
+      }
+
+      if (typeof confidence === 'number' && Number.isFinite(confidence)) {
+        const confPct = Math.round(confidence * 100);
+        metaHtml += `
+          <div style="margin-top: 10px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 3px;">
+              <span class="mute">Evidence Grounding</span>
+              <span style="font-weight: 600; color: var(--forest);">${confPct}%</span>
+            </div>
+            <div class="bar">
+              <i style="width: ${confPct}%;"></i>
+            </div>
           </div>
-          <div class="bar">
-            <i style="width: ${confPct}%;"></i>
-          </div>
-        </div>
-      `;
-    }
+        `;
+      }
 
-    footerEl.innerHTML = metaHtml;
+      footerEl.innerHTML = metaHtml;
+    } catch (renderErr: any) {
+      console.error('[MedTwin] Chat bubble render failed:', renderErr);
+      contentEl.innerHTML = `<span style="color: var(--danger); font-weight: 500;">Unable to render this response. Please try again.</span>`;
+      footerEl.innerHTML = '';
+    }
   } catch (err: any) {
     markEarlyExit(err.message || 'Stream connection failed');
     contentEl.innerHTML = `<span style="color: var(--danger);">Error contacting multi-agent pipeline: ${err.message || 'Stream connection failed'}</span>`;
