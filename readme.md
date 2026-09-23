@@ -14,7 +14,7 @@ Every generated response passes through a dedicated **Verifier** that checks whe
 
 ---
 
-##  What Makes MedTwin Different?
+## What Makes MedTwin Different?
 
 Most health chatbots simply send a question to an LLM.
 
@@ -44,7 +44,7 @@ Medical targets are retrieved from authoritative guidelines, while the ML model 
 
 ---
 
-##  Full Project Workflow
+## Full Project Workflow
 
 This section walks through **everything that happens, end to end**, from the moment a user opens the app to the moment they get an answer.
 
@@ -92,16 +92,16 @@ This section walks through **everything that happens, end to end**, from the mom
 
 ```mermaid
 flowchart TD
-    A[Upload PDF/CSV] --> B[Blob Storage: save original file]
-    B --> C[Document Intelligence: OCR]
-    C --> D[LLM: extract structured JSON]
-    D --> E[Python: validate units & ranges]
-    E --> F[RAG: retrieve guideline target per value]
-    F --> G[LLM: label at_goal / needs_attention + cite source]
-    E --> H[ML Model: risk score + percentiles]
-    G --> I[Save Digital Twin to DB]
+    A["Upload PDF or CSV"] --> B["Blob Storage: save original file"]
+    B --> C["Document Intelligence: OCR"]
+    C --> D["LLM: extract structured JSON"]
+    D --> E["Python: validate units and ranges"]
+    E --> F["RAG: retrieve guideline target per value"]
+    F --> G["LLM: label value, cite source"]
+    E --> H["ML Model: risk score and percentiles"]
+    G --> I["Save Digital Twin to DB"]
     H --> I
-    I --> J[Twin Summary shown to user]
+    I --> J["Twin Summary shown to user"]
 ```
 
 ### Phase 3 — Answering a Question (every time, text or voice)
@@ -140,15 +140,15 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    Q[Question - text or voice] --> S[Scope Agent]
-    S -->|off-topic| X[Polite refusal]
-    S -->|on-topic| T[Twin Agent: load profile]
-    T --> K[Knowledge Agent: RAG search]
-    K --> M[Simulation Agent: what-if only]
-    M --> AN[Answer Agent: grounded response]
-    AN --> V[Verifier Agent: check claims + confidence]
-    V --> R[Final Answer + Sources + Confidence]
-    R -->|voice mode| TTS[Text-to-Speech]
+    Q["Question: text or voice"] --> S["Scope Agent"]
+    S -->|off-topic| X["Polite refusal"]
+    S -->|on-topic| T["Twin Agent: load profile"]
+    T --> K["Knowledge Agent: RAG search"]
+    K --> M["Simulation Agent: what-if only"]
+    M --> AN["Answer Agent: grounded response"]
+    AN --> V["Verifier Agent: check claims"]
+    V --> R["Final Answer, Sources, Confidence"]
+    R -->|voice mode| TTS["Text-to-Speech"]
 ```
 
 ### Phase 4 — Repeat Use
@@ -190,7 +190,7 @@ Each value can be marked as:
 
 ---
 
-###  Machine Learning Risk Engine
+### Machine Learning Risk Engine
 
 MedTwin uses a **scikit-learn Random Forest model** trained on NHANES data.
 
