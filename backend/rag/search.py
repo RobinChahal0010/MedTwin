@@ -26,7 +26,6 @@ def search_guidelines(query: str, top: int = 4) -> list[dict]:
     return [
         {"text": r["chunk"], "source": r["title"], "score": r.get("@search.score", 0)}
         for r in rows
-        if r.get("@search.score", 0) > 0.5   # drop weak/irrelevant matches
     ]
 
 
