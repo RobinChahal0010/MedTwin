@@ -24,7 +24,8 @@ app = FastAPI(title="MedTwin AI backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten this before a real deployment
+    allow_origins=["https://gentle-tree-0d75a2100.1.azurestaticapps.net"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
