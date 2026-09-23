@@ -3,6 +3,7 @@ Replaces the Node/Express auth service. Reads/writes the SAME `users`
 collection Node used to own, so existing signed-up users still work
 (their passwords will need to be reset/rehashed once, see note below).
 """
+import logging
 import os
 from datetime import datetime, timedelta, timezone
 
@@ -13,6 +14,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
 
 from db import db
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/auth")
 users = db.users
@@ -59,42 +62,54 @@ def get_current_user_id(creds: HTTPAuthorizationCredentials = Depends(_bearer)) 
 
 @router.post("/signup")
 def signup(body: SignupBody):
-    if len(body.username) < 5 or len(body.username) > 20:
-        raise HTTPException(400, "Username must be 5-20 characters")
-    if len(body.password) < 8:
-        raise HTTPException(400, "Password must be at least 8 characters")
+    try:
+        if len(body.username) < 5 or len(body.username) > 20:
+            raise HTTPException(400, "Username must be 5-20 characters")
+        if len(body.password) < 8:
+            raise HTTPException(400, "Password must be at least 8 characters")
 
-    email = body.emailId.strip().lower()
-    if users.find_one({"emailId": email}):
-        raise HTTPException(409, "Email already registered")
+        email = body.emailId.strip().lower()
+        if users.find_one({"emailId": email}):
+            raise HTTPException(409, "Email already registered")
 
-    hashed = bcrypt.hashpw(body.password.encode(), bcrypt.gensalt()).decode()
-    result = users.insert_one({
-        "username": body.username,
-        "emailId": email,
-        "password": hashed,
-        "createdAt": datetime.now(timezone.utc),
-    })
+        hashed = bcrypt.hashpw(body.password.encode(), bcrypt.gensalt()).decode()
+        result = users.insert_one({
+            "username": body.username,
+            "emailId": email,
+            "password": hashed,
+            "createdAt": datetime.now(timezone.utc),
+        })
 
-    user_id = str(result.inserted_id)
-    return {
-        "message": "Signup successful",
-        "token": _make_token(user_id),
-        "user": {"id": user_id, "username": body.username, "emailId": email},
-    }
+        user_id = str(result.inserted_id)
+        return {
+            "message": "Signup successful",
+            "token": _make_token(user_id),
+            "user": {"id": user_id, "username": body.username, "emailId": email},
+        }
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Signup failed for email=%s", body.emailId)
+        raise HTTPException(status_code=500, detail="Signup failed due to server error. Check App Service logs for the MongoDB/DB exception.")
 
 
 @router.post("/login")
 def login(body: LoginBody):
-    email = body.emailId.strip().lower()
-    user = users.find_one({"emailId": email})
+    try:
+        email = body.emailId.strip().lower()
+        user = users.find_one({"emailId": email})
 
-    if not user or not bcrypt.checkpw(body.password.encode(), user["password"].encode()):
-        raise HTTPException(401, "Invalid email or password")
+        if not user or not bcrypt.checkpw(body.password.encode(), user["password"].encode()):
+            raise HTTPException(401, "Invalid email or password")
 
-    user_id = str(user["_id"])
-    return {
-        "message": "Login successful",
-        "token": _make_token(user_id),
-        "user": {"id": user_id, "username": user["username"], "emailId": user["emailId"]},
-    }
+        user_id = str(user["_id"])
+        return {
+            "message": "Login successful",
+            "token": _make_token(user_id),
+            "user": {"id": user_id, "username": user["username"], "emailId": user["emailId"]},
+        }
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Login failed for email=%s", body.emailId)
+        raise HTTPException(status_code=500, detail="Login failed due to server error. Check App Service logs for the MongoDB/DB exception.")

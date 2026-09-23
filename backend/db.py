@@ -3,11 +3,39 @@ One MongoDB connection, shared by the whole app. The Node.js auth service
 uses the SAME MongoDB (same MONGODB_URI), so user_id values line up
 between the two services without them ever calling each other.
 """
+import logging
+
 from pymongo import MongoClient
 import config
 
-_client = MongoClient(config.MONGODB_URI)
-db = _client["medtwin"]
+logger = logging.getLogger(__name__)
+
+
+def _build_mongo_uri() -> str:
+    raw_uri = (config.MONGODB_URI or "").strip()
+    if not raw_uri:
+        raise RuntimeError(
+            "DB_CONNECTION_STRING is missing or empty. Set it in Azure App Service Configuration > Environment variables before starting the backend."
+        )
+
+    lowered = raw_uri.lower()
+    if "cosmos" in lowered and "retrywrites=false" not in lowered:
+        separator = "&" if "?" in raw_uri else "?"
+        raw_uri = f"{raw_uri}{separator}retrywrites=false"
+        logger.warning("Cosmos DB connection string did not include retrywrites=false; appended it automatically.")
+
+    return raw_uri
+
+
+try:
+    _mongo_uri = _build_mongo_uri()
+    _client = MongoClient(_mongo_uri, serverSelectionTimeoutMS=20000)
+    db = _client["medtwin"]
+except RuntimeError:
+    raise
+except Exception:
+    logger.exception("MongoDB connection initialization failed using DB_CONNECTION_STRING")
+    raise
 
 # Collections
 users = db.users            # managed by the Node auth service, read-only here
