@@ -11,10 +11,12 @@ export interface StoredUser {
   language?: string;
 }
 
+const DEFAULT_API_BASE_URL = 'https://medtwin-ajhpaxgsbchtdkaz.koreacentral-01.azurewebsites.net';
+
 export const API_BASE_URL = (
   (typeof window !== 'undefined' && (window as any).__API_BASE_URL__) ||
   (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_API_URL : undefined) ||
-  ''
+  DEFAULT_API_BASE_URL
 ).replace(/\/$/, '');
 
 export function apiUrl(path: string): string {
