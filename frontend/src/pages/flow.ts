@@ -263,11 +263,16 @@ function showResultBox() {
     if (accumulatedSources && accumulatedSources.length > 0) {
       const itemsHtml = accumulatedSources
         .map(
-          (s) => `
+          (s: any) => {
+            const doc = typeof s === 'string' ? s : (s?.doc || s?.source || 'Clinical source');
+            const sec = typeof s === 'object' && s?.sec ? `(${s.sec}): ` : '';
+            const text = typeof s === 'object' && s?.text ? s.text : '';
+            return `
           <div class="source-item" style="margin-top: 6px; padding: 8px 12px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border);">
-            <b>${s.doc}</b> ${s.sec ? `(${s.sec})` : ''}: <span>${s.text}</span>
+            <b>${doc}</b> ${sec}<span>${text}</span>
           </div>
-        `
+        `;
+          }
         )
         .join('');
       sourcesContainer.innerHTML = `

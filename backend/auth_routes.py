@@ -13,6 +13,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
 
+import config
 from db import db
 
 logger = logging.getLogger(__name__)
@@ -88,9 +89,17 @@ def signup(body: SignupBody):
         }
     except HTTPException:
         raise
-    except Exception:
-        logger.exception("Signup failed for email=%s", body.emailId)
-        raise HTTPException(status_code=500, detail="Signup failed due to server error. Check App Service logs for the MongoDB/DB exception.")
+    except Exception as e:
+        logger.exception("Signup failed for email=%s: %s", body.emailId, e)
+        if config.DEV_MODE:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Database error ({type(e).__name__}): {str(e)}"
+            )
+        raise HTTPException(
+            status_code=500,
+            detail="Signup failed due to server error. Check App Service logs for the MongoDB/DB exception."
+        )
 
 
 @router.post("/login")
@@ -110,6 +119,39 @@ def login(body: LoginBody):
         }
     except HTTPException:
         raise
+    except Exception as e:
+        logger.exception("Login failed for email=%s: %s", body.emailId, e)
+        if config.DEV_MODE:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Database error ({type(e).__name__}): {str(e)}"
+            )
+        raise HTTPException(
+            status_code=500,
+            detail="Login failed due to server error. Check App Service logs for the MongoDB/DB exception."
+        )
+
+
+user_router = APIRouter(prefix="/api/user")
+
+
+class UserLanguageBody(BaseModel):
+    userId: str
+    language: str
+
+
+@user_router.post("/language")
+def set_user_language(body: UserLanguageBody):
+    """Save user language preference."""
+    try:
+        from bson import ObjectId
+        users.update_one(
+            {"_id": ObjectId(body.userId)},
+            {"$set": {"preferredLanguage": body.language, "updatedAt": datetime.now(timezone.utc)}}
+        )
     except Exception:
-        logger.exception("Login failed for email=%s", body.emailId)
-        raise HTTPException(status_code=500, detail="Login failed due to server error. Check App Service logs for the MongoDB/DB exception.")
+        users.update_one(
+            {"id": body.userId},
+            {"$set": {"preferredLanguage": body.language, "updatedAt": datetime.now(timezone.utc)}}
+        )
+    return {"status": "ok", "language": body.language}

@@ -17,9 +17,14 @@ from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
-# ai_backend/model/risk.py -> ai_backend/ -> MedTwin/ -> MedTwin/training/outputs
-_DEFAULT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "training", "outputs")
-_MODEL_DIR = os.getenv("MODEL_DIR", _DEFAULT_DIR)
+_candidate_dirs = [
+    os.getenv("MODEL_DIR"),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "training", "outputs")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "outputs")),
+    os.path.abspath(os.path.join(os.getcwd(), "training", "outputs")),
+    os.path.abspath(os.path.join(os.getcwd(), "..", "training", "outputs")),
+]
+_MODEL_DIR = next((d for d in _candidate_dirs if d and os.path.exists(os.path.join(d, "risk_model.joblib"))), _candidate_dirs[1])
 
 _model = joblib.load(os.path.join(_MODEL_DIR, "risk_model.joblib"))
 _reference = pd.read_csv(os.path.join(_MODEL_DIR, "reference.csv"))

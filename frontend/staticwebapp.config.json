@@ -1,0 +1,49 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*.{png,jpg,gif,svg}", "/css/*", "/assets/*", "/*.js", "/*.css"]
+  },
+  "routes": [
+    {
+      "route": "/login",
+      "rewrite": "/login.html"
+    },
+    {
+      "route": "/signup",
+      "rewrite": "/signup.html"
+    },
+    {
+      "route": "/twin",
+      "rewrite": "/twin.html"
+    },
+    {
+      "route": "/upload",
+      "rewrite": "/upload.html"
+    },
+    {
+      "route": "/chat",
+      "rewrite": "/chat.html"
+    },
+    {
+      "route": "/flow",
+      "rewrite": "/flow.html"
+    },
+    {
+      "route": "/home",
+      "rewrite": "/home.html"
+    },
+    {
+      "route": "/profile",
+      "rewrite": "/profile.html"
+    }
+  ],
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN"
+  },
+  "mimeTypes": {
+    ".json": "application/json",
+    ".js": "text/javascript",
+    ".css": "text/css"
+  }
+}

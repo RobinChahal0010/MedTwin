@@ -193,15 +193,15 @@ async function loadTwin() {
       },
     });
 
-    const data = await res.json();
-    if (!res.ok || data.error) {
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data || data.error) {
       // If no twin found yet, guide user
       if (loadingStateEl) loadingStateEl.style.display = 'none';
       if (errorStateEl) {
         errorStateEl.style.display = 'block';
         if (errorMessageEl) {
           errorMessageEl.textContent =
-            data.error || 'No digital twin found for your account yet. Please upload your health biomarkers first.';
+            data?.error || (res.status === 404 ? 'No digital twin found for your account yet. Please upload your health biomarkers first.' : `Failed to load digital twin (HTTP ${res.status}).`);
         }
       }
       return;

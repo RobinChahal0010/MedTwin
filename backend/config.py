@@ -24,17 +24,28 @@ DOC_INTEL_ENDPOINT = os.getenv("DOC_INTEL_ENDPOINT")
 DOC_INTEL_KEY = os.getenv("DOC_INTEL_KEY")
 
 SPEECH_KEY = os.getenv("SPEECH_KEY")
-SPEECH_REGION = os.getenv("SPEECH_REGION")
+# Strip whitespace — .env value was "  " (two spaces) which broke the SDK
+SPEECH_REGION = (os.getenv("SPEECH_REGION") or "").strip()
 
 MONGODB_URI = os.getenv("DB_CONNECTION_STRING")
 
-SELF_BASE_URL = os.getenv("SELF_BASE_URL", "http://localhost:8000")
+# DEV_MODE: set to "true" in local development to allow localhost CORS origins.
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() in ("1", "true", "yes")
 
+# All values that must be present for the app to function.
+# check_config() is called at startup BEFORE importing any route module that
+# does module-level client initialization (e.g. BlobServiceClient, DocumentIntelligenceClient).
 REQUIRED = {
     "AZURE_OPENAI_ENDPOINT": AZURE_OPENAI_ENDPOINT,
     "AZURE_OPENAI_KEY": AZURE_OPENAI_KEY,
     "CHAT_DEPLOYMENT": CHAT_DEPLOYMENT,
     "MONGODB_URI": MONGODB_URI,
+    "STORAGE_CONNECTION_STRING": STORAGE_CONNECTION_STRING,
+    "DOC_INTEL_ENDPOINT": DOC_INTEL_ENDPOINT,
+    "DOC_INTEL_KEY": DOC_INTEL_KEY,
+    "SPEECH_KEY": SPEECH_KEY,
+    "SPEECH_REGION": SPEECH_REGION,
+    "SEARCH_QUERY_KEY": SEARCH_QUERY_KEY,
 }
 
 

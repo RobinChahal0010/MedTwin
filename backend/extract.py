@@ -12,6 +12,10 @@ from azure.core.credentials import AzureKeyCredential
 import config
 from llm import ask_llm
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 _doc_client = DocumentIntelligenceClient(
     config.DOC_INTEL_ENDPOINT, AzureKeyCredential(config.DOC_INTEL_KEY)
 )
@@ -20,13 +24,29 @@ TWIN_FIELDS = ["age", "sex", "bmi", "sbp", "dbp", "total_chol", "hdl",
                "creatinine", "hba1c", "insulin"]
 
 
-def ocr_report(file_bytes: bytes) -> str:
+def _detect_content_type(file_bytes: bytes, fallback: str = "application/pdf") -> str:
+    """Infer MIME type from magic bytes if possible."""
+    if file_bytes.startswith(b"%PDF"):
+        return "application/pdf"
+    elif file_bytes.startswith(b"\x89PNG"):
+        return "image/png"
+    elif file_bytes.startswith(b"\xff\xd8"):
+        return "image/jpeg"
+    elif file_bytes.startswith(b"RIFF") and file_bytes[8:12] == b"WEBP":
+        return "image/webp"
+    elif file_bytes.startswith(b"II*\x00") or file_bytes.startswith(b"MM\x00*"):
+        return "image/tiff"
+    return fallback or "application/pdf"
+
+
+def ocr_report(file_bytes: bytes, content_type: str | None = None) -> str:
     """OCR only — returns the plain text/tables found in a PDF or image. No AI judgment."""
+    resolved_type = _detect_content_type(file_bytes, fallback=content_type or "application/pdf")
     poller = _doc_client.begin_analyze_document(
-        "prebuilt-layout", body=file_bytes, content_type="application/pdf"
+        "prebuilt-layout", body=file_bytes, content_type=resolved_type
     )
     text = poller.result().content
-    print(f"OCR extracted {len(text)} characters. First 300: {text[:300]!r}")  # TEMP
+    logger.debug("OCR extracted %d characters from document", len(text))
     return text
 
 
@@ -51,7 +71,7 @@ def extract_values(report_text: str) -> dict:
         "field names given. You never invent numbers.",
         prompt, json_mode=True,
     )
-    print("RAW extraction from LLM:", result)  # TEMP: remove once this is working
+    logger.debug("Structured extraction completed")
 
     # Normalize keys (lowercase, strip spaces) in case the model varies casing
     normalized = {str(k).strip().lower(): v for k, v in result.items()}

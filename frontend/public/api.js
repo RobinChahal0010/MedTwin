@@ -3,9 +3,9 @@
  */
 window.API = window.API || {
   async chatStream(params, onEvent, onError, onComplete) {
-    const baseUrl = window.location.origin;
+    const baseUrl = (window.__API_BASE_URL__ || 'https://medtwin-ajhpaxgsbchtdkaz.koreacentral-01.azurewebsites.net').replace(/\/$/, '');
     try {
-      const res = await fetch('/chat/stream', {
+      const res = await fetch(`${baseUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
         body: JSON.stringify(params),

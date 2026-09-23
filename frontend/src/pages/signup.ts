@@ -92,9 +92,9 @@ formSignup?.addEventListener('submit', async (e) => {
       body: JSON.stringify({ username, emailId, password }),
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.detail || data.message || 'Signup failed. Please try a different email address.');
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data) {
+      throw new Error(data?.detail || data?.message || `Signup failed (HTTP ${res.status}). Please try a different email address.`);
     }
 
     if (data.user && data.user.id && data.token) {

@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
@@ -79,20 +80,9 @@
                 <span id="voice-live-badge">Ready</span>
               </div>
               <div id="voice-transcript-text" class="voice-transcript-content">
-                Tap the microphone above to start. Your speech will be recognized, transcribed, and can be sent to the clinical reasoning chain.
+                Tap the microphone above to start. Your speech will be recognized and sent automatically.
               </div>
-              <div class="voice-transcript-actions">
-                <button type="button" id="voice-clear-btn" class="chat-prompt-pill" style="display: none; background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.2);">
-                  Clear
-                </button>
-                <button type="button" id="voice-send-btn" class="voice-send-transcript-btn" style="display: none;">
-                  <span>Ask MedTwin</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                  </svg>
-                </button>
-              </div>
+              <div class="voice-transcript-actions" style="gap: 8px;"></div>
             </div>
           </section>
 

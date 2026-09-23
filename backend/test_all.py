@@ -42,5 +42,7 @@ QUESTIONS = [
 ]
 for q, mode in QUESTIONS:
     check(f"chat: {q!r}", lambda q=q, mode=mode: requests.post(
-        f"{BASE}/chat", json={"user_id": USER_ID, "question": q, "mode": mode}
+        f"{BASE}/chat",
+        headers={"Accept": "application/json"},
+        json={"user_id": USER_ID, "question": q, "mode": mode}
     ).json())

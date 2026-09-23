@@ -13,7 +13,7 @@ cffi
 charset-normalizer
 click
 cloudpickle
-config
+bcrypt
 cryptography
 dnspython
 fastapi

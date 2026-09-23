@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
@@ -54,21 +55,119 @@
                 <div id="active-lang-display" style="font-size: 1.15rem; font-weight: 700; color: var(--forest);">English (India)</div>
                 <div id="lang-saved-msg" style="display: none; font-size: 0.76rem; color: #2e7d32; font-weight: 600; margin-top: 2px;">✓ Preference saved</div>
               </div>
-              <div>
-                <select id="profile-lang-select" style="padding: 8px 16px; font-size: 0.86rem; font-weight: 600; border: 1px solid var(--border); border-radius: 9999px; background: #fff; color: var(--forest); cursor: pointer; outline: none;">
+              <!-- Custom rounded dropdown (replaces native <select>) -->
+              <div class="prof-dd" id="prof-dd-wrap">
+                <button type="button" class="prof-dd-trigger" id="prof-dd-trigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="prof-dd-label">English (India)</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <ul class="prof-dd-list" id="prof-dd-list" role="listbox" aria-label="Language">
+                  <li class="prof-dd-item" data-value="en-IN" role="option">English (India)</li>
+                  <li class="prof-dd-item" data-value="hi-IN" role="option">हिन्दी (Hindi)</li>
+                  <li class="prof-dd-item" data-value="bn-IN" role="option">বাংলা (Bengali)</li>
+                  <li class="prof-dd-item" data-value="ta-IN" role="option">தமிழ் (Tamil)</li>
+                  <li class="prof-dd-item" data-value="te-IN" role="option">తెలుగు (Telugu)</li>
+                  <li class="prof-dd-item" data-value="mr-IN" role="option">मराठी (Marathi)</li>
+                  <li class="prof-dd-item" data-value="en-US" role="option">English (US)</li>
+                </ul>
+                <!-- Hidden native select kept in sync so profile.ts reads #profile-lang-select -->
+                <select id="profile-lang-select" aria-hidden="true" style="display:none;">
                   <option value="en-IN">English (India)</option>
                   <option value="hi-IN">हिन्दी (Hindi)</option>
                   <option value="bn-IN">বাংলা (Bengali)</option>
                   <option value="ta-IN">தமிழ் (Tamil)</option>
                   <option value="te-IN">తెలుగు (Telugu)</option>
                   <option value="mr-IN">मराठी (Marathi)</option>
-                  <option value="gu-IN">ગુજરાતી (Gujarati)</option>
-                  <option value="kn-IN">ಕನ್ನಡ (Kannada)</option>
-                  <option value="ml-IN">മലയാളം (Malayalam)</option>
-                  <option value="pa-IN">ਪੰਜਾਬੀ (Punjabi)</option>
-                  <option value="ur-IN">اردو (Urdu)</option>
+                  <option value="en-US">English (US)</option>
                 </select>
               </div>
+              <style>
+                /* ── Custom dropdown: trigger ── */
+                .prof-dd { position: relative; }
+                .prof-dd-trigger {
+                  display: inline-flex; align-items: center; gap: 8px;
+                  padding: 8px 16px; font-size: 0.86rem; font-weight: 600;
+                  border: 1px solid var(--border); border-radius: 9999px;
+                  background: #fff; color: var(--forest);
+                  cursor: pointer; outline: none;
+                  transition: border-color 0.15s, box-shadow 0.15s;
+                  font-family: inherit;
+                }
+                .prof-dd-trigger:hover { border-color: var(--forest); }
+                .prof-dd-trigger:focus-visible {
+                  box-shadow: 0 0 0 3px rgba(42,91,69,0.18);
+                  border-color: var(--forest);
+                }
+                .prof-dd-trigger svg { flex-shrink: 0; transition: transform 0.2s; }
+                .prof-dd.open .prof-dd-trigger svg { transform: rotate(180deg); }
+
+                /* ── Custom dropdown: popup list ── */
+                .prof-dd-list {
+                  position: absolute; right: 0; bottom: calc(100% + 8px);
+                  min-width: 180px;
+                  background: #fff;
+                  border: 1px solid var(--border-light, #e0e5dc);
+                  border-radius: 16px;
+                  box-shadow: 0 -4px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+                  padding: 6px;
+                  margin: 0; list-style: none;
+                  z-index: 999;
+                  opacity: 0; transform: translateY(6px) scale(0.97);
+                  pointer-events: none;
+                  transition: opacity 0.15s ease, transform 0.15s ease;
+                }
+                .prof-dd.open .prof-dd-list {
+                  opacity: 1; transform: translateY(0) scale(1);
+                  pointer-events: all;
+                }
+                .prof-dd-item {
+                  padding: 9px 14px; border-radius: 10px;
+                  font-size: 0.86rem; font-weight: 500; color: var(--forest);
+                  cursor: pointer; transition: background 0.12s;
+                }
+                .prof-dd-item:hover { background: var(--input-bg, #f4f6f2); }
+                .prof-dd-item.selected {
+                  background: var(--forest); color: #fff; font-weight: 600;
+                }
+              </style>
+              <script>
+                (function () {
+                  const wrap    = document.getElementById('prof-dd-wrap');
+                  const trigger = document.getElementById('prof-dd-trigger');
+                  const list    = document.getElementById('prof-dd-list');
+                  const label   = document.getElementById('prof-dd-label');
+                  const hidden  = document.getElementById('profile-lang-select');
+                  const items   = list.querySelectorAll('.prof-dd-item');
+
+                  function open()  { wrap.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
+                  function close() { wrap.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); }
+                  function toggle(){ wrap.classList.contains('open') ? close() : open(); }
+
+                  trigger.addEventListener('click', toggle);
+                  document.addEventListener('click', e => { if (!wrap.contains(e.target)) close(); });
+                  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+                  items.forEach(item => {
+                    item.addEventListener('click', () => {
+                      const val  = item.dataset.value;
+                      const text = item.textContent;
+                      // Update UI
+                      label.textContent = text;
+                      items.forEach(i => i.classList.remove('selected'));
+                      item.classList.add('selected');
+                      // Sync hidden select so profile.ts fires its change handler normally
+                      hidden.value = val;
+                      hidden.dispatchEvent(new Event('change', { bubbles: true }));
+                      close();
+                    });
+                  });
+
+                  // Mark the initial selection
+                  const initial = hidden.value || 'en-IN';
+                  items.forEach(i => { if (i.dataset.value === initial) i.classList.add('selected'); });
+                })();
+              </script>
+
             </div>
           </div>
         </div>

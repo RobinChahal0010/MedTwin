@@ -29,8 +29,9 @@ def ask_llm(instructions: str, message: str, json_mode: bool = False):
             {"role": "user", "content": message},
         ],
         temperature=0,
+        timeout=45.0,
     )
-    text = response.choices[0].message.content.strip()
+    text = (response.choices[0].message.content or "").strip()
 
     if not json_mode:
         return text

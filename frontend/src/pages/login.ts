@@ -82,9 +82,9 @@ formLogin?.addEventListener('submit', async (e) => {
       body: JSON.stringify({ emailId, password }),
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.detail || data.message || 'Login failed. Please check your credentials.');
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data) {
+      throw new Error(data?.detail || data?.message || `Login failed (HTTP ${res.status}). Please check your credentials.`);
     }
 
     if (data.user && data.user.id && data.token) {

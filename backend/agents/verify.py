@@ -37,9 +37,27 @@ line write: CONFIDENCE: <fraction of claims that were supported, 0.0 to 1.0>
         except ValueError:
             pass
 
+    sources_formatted = []
+    for s in state.get("sources", []):
+        if isinstance(s, dict):
+            src_name = s.get("source") or s.get("title") or "Clinical source"
+            sources_formatted.append({
+                "doc": src_name,
+                "source": src_name,
+                "sec": s.get("sec", ""),
+                "text": s.get("text", "")
+            })
+        elif isinstance(s, str):
+            sources_formatted.append({
+                "doc": s,
+                "source": s,
+                "sec": "",
+                "text": ""
+            })
+
     result = {
         "answer": final_answer.strip(),
-        "sources": [s["source"] for s in state["sources"]],
+        "sources": sources_formatted,
         "confidence": round(confidence, 2),
     }
     log_chat(state["user_id"], state["question"], result["answer"], result["confidence"])
