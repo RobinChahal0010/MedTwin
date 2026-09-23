@@ -3,17 +3,16 @@ Agent 4: Simulation. Job: for "what if" questions, change one twin value
 and re-run the ML model to compare before/after risk. Skipped for
 ordinary questions. Always labeled an estimate, never a forecast.
 """
-import httpx
 from fastapi import APIRouter
-import config
+
 from llm import ask_llm
 from model.risk import predict_risk
+from .answer import run_answer
 
 router = APIRouter()
 
 
-@router.post("/agents/simulate")
-def simulate(state: dict):
+def run_simulate(state: dict):
     question = state["question"].lower()
     is_whatif = "what if" in question or "what-if" in question
 
@@ -37,5 +36,9 @@ def simulate(state: dict):
                         "data and guideline targets — not a medical forecast.",
             }
 
-    resp = httpx.post(f"{config.SELF_BASE_URL}/agents/answer", json=state, timeout=60)
-    return resp.json()
+    return run_answer(state)
+
+
+@router.post("/agents/simulate")
+def simulate(state: dict):
+    return run_simulate(state)

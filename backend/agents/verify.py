@@ -4,6 +4,7 @@ retrieved passages and the twin, drop anything unsupported, and compute
 a confidence score. This is the LAST step — its output goes to the user.
 """
 from fastapi import APIRouter
+
 from llm import ask_llm
 from rag.search import format_passages
 from db import log_chat
@@ -11,8 +12,7 @@ from db import log_chat
 router = APIRouter()
 
 
-@router.post("/agents/verify")
-def verify(state: dict):
+def run_verify(state: dict):
     prompt = f"""Draft answer:
 {state['draft']}
 
@@ -44,3 +44,8 @@ line write: CONFIDENCE: <fraction of claims that were supported, 0.0 to 1.0>
     }
     log_chat(state["user_id"], state["question"], result["answer"], result["confidence"])
     return result
+
+
+@router.post("/agents/verify")
+def verify(state: dict):
+    return run_verify(state)

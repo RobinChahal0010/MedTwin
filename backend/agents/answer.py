@@ -4,17 +4,16 @@ retrieved guideline passages, and the (optional) simulation — nothing
 made up. Adjusts language for patient vs clinician mode.
 """
 import json
-import httpx
 from fastapi import APIRouter
-import config
+
 from llm import ask_llm
 from rag.search import format_passages
+from .verify import run_verify
 
 router = APIRouter()
 
 
-@router.post("/agents/answer")
-def answer(state: dict):
+def run_answer(state: dict):
     mode = state.get("mode", "patient")
     style = ("Explain in simple, everyday language, no jargon."
              if mode == "patient" else
@@ -41,5 +40,9 @@ Rules:
         "medical fact that isn't in the supplied passages.", prompt,
     )
 
-    resp = httpx.post(f"{config.SELF_BASE_URL}/agents/verify", json=state, timeout=60)
-    return resp.json()
+    return run_verify(state)
+
+
+@router.post("/agents/answer")
+def answer(state: dict):
+    return run_answer(state)

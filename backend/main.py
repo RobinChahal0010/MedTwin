@@ -2,22 +2,21 @@
 Entry point. Run with:  uvicorn main:app --reload
 Docs page (test every endpoint from the browser):  http://127.0.0.1:8000/docs
 """
-import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import config
-config.check_config()  # fail fast if .env is incomplete
-
-from auth_routes import router as auth_router
-from twin_routes import router as twin_router
-from speech_routes import router as speech_router
-from agents.scope import router as scope_router
+from agents.scope import run_scope, router as scope_router
 from agents.twin import router as twin_agent_router
 from agents.knowledge import router as knowledge_router
 from agents.simulate import router as simulate_router
 from agents.answer import router as answer_router
 from agents.verify import router as verify_router
+from auth_routes import router as auth_router
+from speech_routes import router as speech_router
+from twin_routes import router as twin_router
+
+config.check_config()  # fail fast if .env is incomplete
 
 
 app = FastAPI(title="MedTwin AI backend")
@@ -51,5 +50,4 @@ def chat(payload: dict):
         "question": payload["question"],
         "mode": payload.get("mode", "patient"),
     }
-    resp = httpx.post(f"{config.SELF_BASE_URL}/agents/scope", json=state, timeout=90)
-    return resp.json()
+    return run_scope(state)
