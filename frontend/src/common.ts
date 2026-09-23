@@ -13,8 +13,8 @@ export interface StoredUser {
 
 export const API_BASE_URL = (
   (typeof window !== 'undefined' && (window as any).__API_BASE_URL__) ||
-  (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_API_BASE_URL : undefined) ||
-  'http://127.0.0.1:8000'
+  (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_API_URL : undefined) ||
+  ''
 ).replace(/\/$/, '');
 
 export function apiUrl(path: string): string {
