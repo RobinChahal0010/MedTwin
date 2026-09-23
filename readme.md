@@ -1,4 +1,4 @@
-# 🩺 MedTwin
+# MedTwin
 
 ### AI-Powered Digital Twin for Type 2 Diabetes
 
@@ -10,11 +10,11 @@ The system combines the patient's own data with a trained **machine learning ris
 
 Every generated response passes through a dedicated **Verifier** that checks whether its claims are supported by the patient's data and retrieved sources.
 
-> ⚠️ **Educational Demo Only:** MedTwin is not a medical diagnostic system and must not be used for real clinical decisions.
+> **Educational Demo Only:** MedTwin is not a medical diagnostic system and must not be used for real clinical decisions.
 
 ---
 
-## ✨ What Makes MedTwin Different?
+##  What Makes MedTwin Different?
 
 Most health chatbots simply send a question to an LLM.
 
@@ -44,9 +44,127 @@ Medical targets are retrieved from authoritative guidelines, while the ML model 
 
 ---
 
-## 🚀 Core Features
+##  Full Project Workflow
 
-### 🧬 Digital Twin
+This section walks through **everything that happens, end to end**, from the moment a user opens the app to the moment they get an answer.
+
+### Phase 1 — Account Access
+
+```text
+1. User opens the Streamlit frontend
+2. User signs up (username, email, password) or logs in
+3. Credentials are checked against the database
+4. Passwords are stored only as bcrypt hashes — never in plain text
+5. On success, the user's ID is stored in the session
+```
+
+### Phase 2 — Building the Digital Twin (one-time, per report)
+
+```text
+1. User uploads a lab report (PDF) or enters values manually
+2. The original file is saved to Azure Blob Storage, unchanged
+3. Azure AI Document Intelligence (OCR) reads the file
+   → returns plain text + tables
+   → this step does NOT use an LLM and has no medical understanding
+4. An LLM reads ONLY that extracted text (never the original file)
+   and fills a fixed JSON schema:
+      age, sex, bmi, sbp, dbp, total_chol, hdl,
+      creatinine, hba1c, insulin
+   → any value not found in the report is left null — never guessed
+5. Plain Python code validates the values:
+      - fixes/checks units (e.g. mg/dL vs mmol/L)
+      - rejects implausible numbers (typos, impossible ranges)
+      - NO medical judgment happens here
+6. For each value, the system retrieves the matching guideline
+   target via Azure AI Search (RAG) and an LLM labels the value:
+      ✓ At Goal        or        ⚠ Needs Attention
+   citing the exact guideline passage — nothing is invented
+7. The trained ML model (Random Forest, trained on NHANES) scores
+   the patient's risk of poor glycemic control, and calculates
+   percentiles against the reference population
+8. All of the above (values + labels + risk score + percentiles)
+   is bundled into ONE profile and saved to the database
+   → this saved profile IS the digital twin
+9. The frontend displays a Twin Summary:
+      each value as a tile with a ✓ / ⚠ badge, plus an overall
+      risk score and percentile bar
+```
+
+```mermaid
+flowchart TD
+    A[Upload PDF/CSV] --> B[Blob Storage: save original file]
+    B --> C[Document Intelligence: OCR]
+    C --> D[LLM: extract structured JSON]
+    D --> E[Python: validate units & ranges]
+    E --> F[RAG: retrieve guideline target per value]
+    F --> G[LLM: label at_goal / needs_attention + cite source]
+    E --> H[ML Model: risk score + percentiles]
+    G --> I[Save Digital Twin to DB]
+    H --> I
+    I --> J[Twin Summary shown to user]
+```
+
+### Phase 3 — Answering a Question (every time, text or voice)
+
+```text
+1. User types a question, OR speaks it
+      → if spoken: Azure Speech-to-Text converts it to text first
+2. /chat receives {user_id, question, mode: patient|clinician}
+3. Scope Agent   → checks the question is actually about Type 2
+                    Diabetes. Off-topic questions are politely
+                    declined here and the chain stops.
+4. Twin Agent    → loads that user's saved digital twin from the
+                    database (their real, stored values)
+5. Knowledge Agent → searches the guideline index (Azure AI Search)
+                      for passages relevant to the question
+6. Simulation Agent → ONLY runs for "what-if" questions.
+                       Takes a value (e.g. BMI, weight), simulates
+                       a change, and re-runs the ML model to show
+                       a before/after risk comparison.
+                       Always labeled: "an estimate based on
+                       population patterns, not a forecast."
+7. Answer Agent  → writes a response using ONLY:
+                      - the patient's twin values
+                      - the ML risk/percentile output
+                      - the retrieved guideline passages
+                    Never allowed to invent a medical fact.
+8. Verifier Agent → splits the draft into individual claims,
+                     checks each one against the sources and the
+                     twin, removes anything unsupported, and
+                     calculates a confidence score:
+                        confidence = supported claims / total claims
+9. Final response returned: {answer, sources, confidence}
+10. If the question was spoken, the answer is converted back to
+    audio via Azure Text-to-Speech and played to the user
+```
+
+```mermaid
+flowchart LR
+    Q[Question - text or voice] --> S[Scope Agent]
+    S -->|off-topic| X[Polite refusal]
+    S -->|on-topic| T[Twin Agent: load profile]
+    T --> K[Knowledge Agent: RAG search]
+    K --> M[Simulation Agent: what-if only]
+    M --> AN[Answer Agent: grounded response]
+    AN --> V[Verifier Agent: check claims + confidence]
+    V --> R[Final Answer + Sources + Confidence]
+    R -->|voice mode| TTS[Text-to-Speech]
+```
+
+### Phase 4 — Repeat Use
+
+```text
+- The digital twin persists in the database.
+- The user can ask unlimited follow-up questions without
+  re-uploading their report.
+- A new report upload replaces/updates the twin with fresh values.
+```
+
+---
+
+## Core Features
+
+### Digital Twin
 
 Creates a structured patient profile containing:
 
@@ -72,7 +190,7 @@ Each value can be marked as:
 
 ---
 
-### 🤖 Machine Learning Risk Engine
+###  Machine Learning Risk Engine
 
 MedTwin uses a **scikit-learn Random Forest model** trained on NHANES data.
 
@@ -96,7 +214,7 @@ The ML model **does not generate medical explanations** and does not determine w
 
 ---
 
-### 📚 Guideline-Grounded RAG
+### Guideline-Grounded RAG
 
 Medical information is retrieved from indexed guideline documents using **Azure AI Search**.
 
@@ -113,7 +231,7 @@ If the required information cannot be found in the retrieved sources, the system
 
 ---
 
-### 🔮 What-If Simulation
+### What-If Simulation
 
 Users can ask questions such as:
 
@@ -135,7 +253,7 @@ The result is explicitly presented as:
 
 ---
 
-### 🛡️ Response Verification
+### Response Verification
 
 Every generated response goes through a dedicated **Verifier agent**.
 
@@ -161,7 +279,7 @@ Final Answer
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart LR
@@ -183,7 +301,7 @@ H --> I["Sources + Confidence"]
 
 ---
 
-## 🤖 Multi-Agent Pipeline
+## Multi-Agent Pipeline
 
 Every agent is exposed through a FastAPI endpoint.
 
@@ -220,7 +338,7 @@ A shared JSON `state` moves through the complete pipeline.
 
 ---
 
-## 📊 Dataset
+## Dataset
 
 The ML model is trained using **NHANES**, the CDC's national health survey.
 
@@ -282,7 +400,7 @@ HbA1c < 7%  → 0
 
 ---
 
-## 🧠 Machine Learning
+## Machine Learning
 
 ### Primary Model
 
@@ -316,7 +434,7 @@ The project also stores a reference dataset used for percentile calculations.
 
 ---
 
-## ☁️ Azure Architecture
+## Azure Architecture
 
 MedTwin uses Azure services for AI, search, storage and speech capabilities.
 
@@ -343,11 +461,13 @@ API --> ML["Local ML Model"]
 * **Azure AI Search** — guideline retrieval
 * **Azure Blob Storage** — uploaded reports and guideline documents
 * **Azure Speech** — speech-to-text and text-to-speech
+* **Azure AI Document Intelligence** — OCR for uploaded reports
+* **Azure Cosmos DB (MongoDB API)** — stores users and digital twins
 * **Azure Resource Group** — project infrastructure
 
 ---
 
-## 🎙️ Voice Interaction
+## Voice Interaction
 
 MedTwin supports a speech-based interaction flow:
 
@@ -369,7 +489,7 @@ This allows users to interact with the system without typing.
 
 ---
 
-## 🖥️ Frontend
+## Frontend
 
 The frontend is built with **Streamlit**.
 
@@ -398,7 +518,7 @@ The chat interface includes:
 
 ---
 
-## 🔐 Responsible AI
+## Responsible AI
 
 MedTwin is designed with several safety principles:
 
@@ -432,7 +552,7 @@ Only dummy or sample reports should be used during demonstrations.
 
 ---
 
-## 📈 Two Different Confidence Concepts
+## Two Different Confidence Concepts
 
 MedTwin intentionally separates model performance from answer confidence.
 
@@ -462,13 +582,22 @@ It **does not mean medical correctness**.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 medtwin/
 │
 ├── backend/
 │   ├── main.py
+│   ├── auth_routes.py
+│   ├── twin_routes.py
+│   ├── speech_routes.py
+│   ├── extract.py
+│   ├── db.py
+│   ├── llm.py
+│   ├── config.py
+│   ├── rag/
+│   │   └── search.py
 │   ├── agents/
 │   │   ├── scope.py
 │   │   ├── twin.py
@@ -494,27 +623,29 @@ medtwin/
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Layer               | Technology         |
-| ------------------- | ------------------ |
-| Language            | Python             |
-| Backend             | FastAPI            |
-| Frontend            | Streamlit          |
-| ML                  | Scikit-learn       |
-| Data Processing     | Pandas             |
-| Model Serialization | Joblib             |
-| LLM                 | Azure OpenAI       |
-| RAG                 | Azure AI Search    |
-| Storage             | Azure Blob Storage |
-| Speech              | Azure Speech       |
-| PDF Processing      | PyPDF              |
-| HTTP                | HTTPX              |
-| Dataset             | NHANES             |
+| Layer               | Technology              |
+| ------------------- | ------------------------ |
+| Language            | Python                   |
+| Backend             | FastAPI                  |
+| Frontend            | Streamlit                |
+| ML                  | Scikit-learn             |
+| Data Processing     | Pandas                   |
+| Model Serialization | Joblib                   |
+| LLM                 | Azure OpenAI             |
+| RAG                 | Azure AI Search          |
+| OCR                 | Azure AI Document Intelligence |
+| Storage             | Azure Blob Storage       |
+| Database            | Azure Cosmos DB (MongoDB API) |
+| Speech              | Azure Speech             |
+| PDF Processing      | PyPDF                    |
+| HTTP                | HTTPX                    |
+| Dataset             | NHANES                   |
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 ### 1. Clone the repository
 
@@ -569,6 +700,9 @@ AZURE_SEARCH_INDEX=
 AZURE_STORAGE_CONNECTION_STRING=
 AZURE_SPEECH_KEY=
 AZURE_SPEECH_REGION=
+DOC_INTEL_ENDPOINT=
+DOC_INTEL_KEY=
+DB_CONNECTION_STRING=
 ```
 
 > Never commit `.env` or Azure credentials to GitHub.
@@ -587,12 +721,13 @@ streamlit run frontend/app.py
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Authentication
 
 ```http
-POST /auth/login
+POST /api/auth/signup
+POST /api/auth/login
 ```
 
 ### Digital Twin
@@ -628,7 +763,7 @@ POST /speech/speak
 
 ---
 
-## 🔄 Example Request Flow
+## Example Request Flow
 
 ```text
 User:
@@ -662,7 +797,7 @@ Final Response
 
 ---
 
-## 🎯 Project Goals
+## Project Goals
 
 MedTwin explores how multiple AI techniques can work together instead of relying on a single chatbot.
 
@@ -688,7 +823,7 @@ The goal is to demonstrate a transparent architecture where **patient data, stat
 
 ---
 
-## ⚠️ Limitations
+## Limitations
 
 * The ML model is trained on a survey snapshot rather than longitudinal clinical records.
 * What-if results are population-based estimates, not forecasts.
@@ -699,7 +834,7 @@ The goal is to demonstrate a transparent architecture where **patient data, stat
 
 ---
 
-## 📚 References
+## References
 
 * **NHANES — National Health and Nutrition Examination Survey**
 * **American Diabetes Association — Standards of Care in Diabetes**
@@ -709,7 +844,7 @@ The goal is to demonstrate a transparent architecture where **patient data, stat
 
 ---
 
-## 👥 Team
+## Team
 
 Built as an educational AI project exploring:
 
@@ -717,7 +852,7 @@ Built as an educational AI project exploring:
 
 ---
 
-## ⚖️ Disclaimer
+## Disclaimer
 
 MedTwin is an **educational and research-oriented prototype**.
 
@@ -731,7 +866,7 @@ If you have a medical concern, consult a qualified healthcare professional.
 
 <p align="center">
 
-### 🧬 MedTwin
+### MedTwin
 
 **Turning patient data into an explainable digital twin.**
 
