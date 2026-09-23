@@ -1,0 +1,10 @@
+{
+  "name": "Remix Remix MedTwin",
+  "description": "Multi-agent digital twin frontend grounded in clinical guidelines and ML.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

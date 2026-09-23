@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Join MedTwin — Authentication</title>
+    <meta name="description" content="Sign in to MedTwin for Type 2 Diabetes digital twin simulations and clinical guideline retrieval." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-container" style="padding-top: 24px; padding-bottom: 60px;">
+        <!-- Already Logged In Banner (if active session exists) -->
+        <div id="logged-in-card" class="card white animate-appear" style="display: none; max-width: 520px; margin: 32px auto; text-align: center; padding: 36px 32px; border-radius: 24px; box-shadow: 0 16px 40px rgba(0,0,0,0.06); border: 1px solid var(--border-light);">
+          <span class="eyebrow" style="font-size: 0.76rem; letter-spacing: 0.1em; color: var(--forest); font-weight: 700;">ACTIVE SESSION FOUND</span>
+          <h2 style="margin: 10px 0 8px; font-size: 1.6rem; color: var(--forest);">Welcome Back</h2>
+          <p class="mute" style="font-size: 0.92rem; margin-bottom: 24px; color: var(--sage-muted);">You are currently signed in to MedTwin on this browser.</p>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button type="button" id="continue-upload-btn" class="auth-submit-btn" style="padding: 13px 20px; font-size: 0.98rem;">Continue to Twin Portal</button>
+            <button type="button" id="switch-account-btn" style="padding: 12px 20px; background: transparent; border: 1px solid var(--border); border-radius: 12px; color: var(--forest); font-weight: 600; font-size: 0.92rem; cursor: pointer; transition: all 0.2s;">Sign out / Switch account</button>
+          </div>
+        </div>
+
+        <!-- Split Auth Layout: Generous, Spacious with Appear Animations -->
+        <div id="auth-card" class="auth-split-wrapper animate-appear">
+          <!-- LEFT CONTAINER: Deep Green with Info about MedTwin -->
+          <div class="auth-info-panel">
+            <!-- Top brand & chip -->
+            <div class="auth-info-top">
+              <div class="auth-brand-lockup">
+                MedTwin
+              </div>
+              <span class="auth-join-chip">Clinical Twin</span>
+            </div>
+
+            <!-- Middle main copy -->
+            <div class="auth-info-content">
+              <h2>Start your Journey</h2>
+              <span class="auth-info-eyebrow">WHAT-IF SIMULATION</span>
+              <div class="auth-info-subhead">See the Effect Before It Happens</div>
+              <p class="auth-info-desc">
+                Explore how lifestyle changes in HbA1c, BMI, and physical activity impact your estimated risk profiles before they occur.
+              </p>
+
+              <!-- 3 Cards with hover-appear & staggered animations -->
+              <div class="auth-cards-grid">
+                <div class="auth-stat-card">
+                  <div class="auth-stat-card-badge">6-Agent</div>
+                  <div class="auth-stat-card-label">Sequential pipeline</div>
+                </div>
+
+                <div class="auth-stat-card">
+                  <div class="auth-stat-card-badge">9</div>
+                  <div class="auth-stat-card-label">Input biomarkers</div>
+                </div>
+
+                <div class="auth-stat-card">
+                  <div class="auth-stat-card-badge">ROC-AUC</div>
+                  <div class="auth-stat-card-label">NHANES benchmark</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT CONTAINER: Clean, Spacious Auth Form -->
+          <div class="auth-form-panel">
+            <!-- Alert Messages -->
+            <div id="auth-error" style="display: none; background: #faeedb; border: 1px solid var(--status-warn-border); color: var(--status-warn-text); padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; margin-bottom: 16px;"></div>
+            <div id="auth-success" style="display: none; background: var(--status-ok-bg); border: 1px solid #c2d6b7; color: var(--status-ok-text); padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; margin-bottom: 16px;"></div>
+
+            <!-- LOGIN FORM -->
+            <form id="form-login" class="animate-fade-up">
+              <h1 class="auth-form-title">Welcome Back</h1>
+              <p class="auth-form-subtitle">Enter your registered email and password to access MedTwin.</p>
+
+              <div class="auth-form-group">
+                <label for="login-email">Email Address</label>
+                <input id="login-email" type="email" placeholder="name@example.com" autocomplete="username" required />
+              </div>
+
+              <div class="auth-form-group">
+                <label for="login-password">Password</label>
+                <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+              </div>
+
+              <button type="submit" id="login-submit-btn" class="auth-submit-btn">Continue</button>
+
+              <div class="auth-switch-text">
+                Don't have an account? <a href="signup.html" id="switch-to-signup" class="auth-switch-link">Sign up</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/src/pages/login.ts"></script>
+  </body>
+</html>

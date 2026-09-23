@@ -1,8 +1,144 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ask a question</title><link rel="stylesheet" href="css/style.css"></head><body>
-<main><div class="row" style="justify-content:space-between"><h1 style="font-size:clamp(2rem,5vw,3rem)">Ask me anything</h1>
-<div class="row"><button class="chip" id="lang">🌐 English</button><button class="chip" id="voice">🔈 Read answers aloud: off</button><button class="chip" id="md">Style: Simple words</button></div></div>
-<p class="mute" style="margin:6px 0 10px">Type or tap the mic and speak, in English or हिन्दी.</p>
-<div class="pipe" id="pp"></div>
-<div class="card"><div id="msgs"></div><div class="row" id="sugg" style="margin:12px 0"></div>
-<form id="f" class="row"><input id="q" placeholder="Type your question here…" style="flex:1;margin:0" aria-label="Your question"><button type="button" class="chip" id="mic">🎙 Speak</button><button class="btn">Send</button></form></div></main>
-<script src="js/api.js"></script><script src="js/cursor.js"></script><script src="js/ui.js"></script><script src="js/chat.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice &amp; Multi-Agent Chat — MedTwin</title>
+    <meta name="description" content="Interactive voice consultation and 6-agent clinical verification for Type 2 Diabetes." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-container">
+        <!-- Top Page Title (Harmonized with Digital Twin and Profile page) -->
+        <div style="margin-bottom: 28px;">
+          <span class="eyebrow">CLINICAL CONSULTATION</span>
+          <h1>Clinical AI &amp; <em>Voice Consultation</em></h1>
+          <p style="margin-top: 6px; font-size: 1.05rem;">
+            Speak naturally or type your inquiry. Watch the multi-agent pipeline simulate scenarios and verify ADA guideline citations.
+          </p>
+        </div>
+
+        <!-- 2-Section Grid (Left: Voice Container, Right: Chat Container) -->
+        <div class="chat-page-grid">
+          <!-- LEFT: Voice Container (no green dot, no language dropdown, fully rounded edges) -->
+          <section class="voice-consult-container" aria-label="Interactive Voice Consultation">
+            <!-- Voice Top Bar -->
+            <div class="voice-top-bar">
+              <div class="voice-status-indicator">
+                <span id="voice-engine-label">Voice Engine Active</span>
+              </div>
+            </div>
+
+            <!-- Voice Center Stage: Mic Option with Pulse & Visualizer -->
+            <div class="voice-center-stage">
+              <div class="voice-mic-halo">
+                <button
+                  type="button"
+                  id="mic-btn"
+                  class="voice-mic-main-btn"
+                  title="Click to speak — speak your question naturally"
+                  aria-label="Toggle voice recording"
+                >
+                  <svg id="voice-mic-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
+                </button>
+              </div>
+
+              <div id="voice-status-title" class="voice-status-title">Tap Mic to Speak</div>
+              <p id="voice-status-desc" class="voice-status-desc">
+                Speak your health question or scenario inquiry clearly into your microphone.
+              </p>
+
+              <!-- Audio Waveform Visualizer -->
+              <div id="voice-waveform" class="voice-wave-container">
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+                <span class="voice-wave-bar"></span>
+              </div>
+            </div>
+
+            <!-- Voice Transcript Box -->
+            <div class="voice-transcript-box">
+              <div class="voice-transcript-header">
+                <span>Live Speech Transcript</span>
+                <span id="voice-live-badge">Ready</span>
+              </div>
+              <div id="voice-transcript-text" class="voice-transcript-content">
+                Tap the microphone above to start. Your speech will be recognized, transcribed, and can be sent to the clinical reasoning chain.
+              </div>
+              <div class="voice-transcript-actions">
+                <button type="button" id="voice-clear-btn" class="chat-prompt-pill" style="display: none; background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.2);">
+                  Clear
+                </button>
+                <button type="button" id="voice-send-btn" class="voice-send-transcript-btn" style="display: none;">
+                  <span>Ask MedTwin</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- RIGHT: Chat Container (Spacious internal padding, no Style toggle, no Suggested pills) -->
+          <section class="chat-consult-container" aria-label="MedTwin AI Chat Consultation">
+            <!-- Chat Header Row -->
+            <div class="chat-header-row">
+              <div class="chat-header-title">
+                MedTwin <span>AI</span>
+              </div>
+            </div>
+
+            <!-- Message Stream Area (Spacious with room from borders) -->
+            <div id="msgs" class="chat-stream-area" style="padding: 26px 28px !important;">
+              <div class="m a" style="max-width: 88%; width: auto;">
+                <div class="assistant-text">
+                  <p>Hello! I am MedTwin AI. Your baseline Type 2 Diabetes digital twin is active. You can speak through the voice console on the left or type your inquiry below. I verify every answer against ADA Standards of Care, NICE NG28, and WHO HEARTS-D guidelines before responding.</p>
+                </div>
+                <div class="assistant-meta" style="margin-top: 8px;">
+                  <small class="mute" style="font-size: 0.76rem;">Educational &amp; research demonstration. Not a medical diagnosis.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Bottom Input Bar (Paper plane icon) -->
+            <form id="chat-form" class="chat-bottom-input-bar">
+              <input
+                id="question-input"
+                class="chat-bottom-input"
+                type="text"
+                placeholder="Ask MedTwin AI a doubt or scenario..."
+                autocomplete="off"
+                required
+              />
+              <button type="submit" id="send-btn" class="chat-submit-plane-btn" title="Send inquiry">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/src/pages/chat.ts"></script>
+  </body>
+</html>

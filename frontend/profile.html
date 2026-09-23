@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile & Settings — MedTwin</title>
+    <meta name="description" content="Manage your clinical twin, learning language, and preferences." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-container">
+        <!-- Page Title & Subtitle (Harmonized with Digital Twin and Chat page) -->
+        <div style="margin-bottom: 28px;">
+          <span class="eyebrow">ACCOUNT &amp; SETTINGS</span>
+          <h1>User Profile &amp; <em>Settings</em></h1>
+          <p style="margin-top: 6px; font-size: 1.05rem;">Manage your clinical digital twin and consultation language preference.</p>
+        </div>
+
+        <!-- Main Profile Card -->
+        <div class="card white" style="padding: 32px 36px; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid var(--border-light); margin-bottom: 24px;">
+          <!-- User info header -->
+          <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 28px; padding-bottom: 22px; border-bottom: 1px solid var(--border-light);">
+            <div id="profile-avatar-initial" style="width: 56px; height: 56px; border-radius: 50%; background: var(--forest); color: #fff; font-size: 1.45rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              P
+            </div>
+            <div>
+              <div id="profile-username" style="font-size: 1.25rem; font-weight: 700; color: var(--forest); line-height: 1.2;">Patient</div>
+              <div id="profile-email" style="font-size: 0.88rem; color: var(--sage-muted); margin-top: 3px;">patient@medtwin.ai</div>
+            </div>
+          </div>
+
+          <!-- Two Sub-Cards (Clinical Twin Status + Default Language) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+            <!-- Sub-Card 1: Clinical Twin -->
+            <div style="background: var(--input-bg); border: 1px solid var(--border); border-radius: 18px; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 14px;">
+              <div>
+                <span style="display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--sage-muted); margin-bottom: 4px;">CURRENT CLINICAL TWIN</span>
+                <div style="font-size: 1.15rem; font-weight: 700; color: var(--forest);">Active Twin</div>
+                <div style="font-size: 0.82rem; color: var(--sage-muted); margin-top: 2px;">Type 2 Diabetes Risk Model</div>
+              </div>
+              <a href="upload.html" class="btn sm" style="background: var(--forest); color: #fff; border-radius: 9999px; padding: 8px 18px; font-size: 0.84rem; font-weight: 600; text-decoration: none; flex-shrink: 0;">
+                Change
+              </a>
+            </div>
+
+            <!-- Sub-Card 2: Default Learning Language -->
+            <div style="background: var(--input-bg); border: 1px solid var(--border); border-radius: 18px; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 14px;">
+              <div>
+                <span style="display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--sage-muted); margin-bottom: 4px;">DEFAULT LEARNING LANGUAGE</span>
+                <div id="active-lang-display" style="font-size: 1.15rem; font-weight: 700; color: var(--forest);">English (India)</div>
+                <div id="lang-saved-msg" style="display: none; font-size: 0.76rem; color: #2e7d32; font-weight: 600; margin-top: 2px;">✓ Preference saved</div>
+              </div>
+              <div>
+                <select id="profile-lang-select" style="padding: 8px 16px; font-size: 0.86rem; font-weight: 600; border: 1px solid var(--border); border-radius: 9999px; background: #fff; color: var(--forest); cursor: pointer; outline: none;">
+                  <option value="en-IN">English (India)</option>
+                  <option value="hi-IN">हिन्दी (Hindi)</option>
+                  <option value="bn-IN">বাংলা (Bengali)</option>
+                  <option value="ta-IN">தமிழ் (Tamil)</option>
+                  <option value="te-IN">తెలుగు (Telugu)</option>
+                  <option value="mr-IN">मराठी (Marathi)</option>
+                  <option value="gu-IN">ગુજરાતી (Gujarati)</option>
+                  <option value="kn-IN">ಕನ್ನಡ (Kannada)</option>
+                  <option value="ml-IN">മലയാളം (Malayalam)</option>
+                  <option value="pa-IN">ਪੰਜਾਬੀ (Punjabi)</option>
+                  <option value="ur-IN">اردو (Urdu)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sign Out Action -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+          <button
+            type="button"
+            id="profile-signout-btn"
+            style="padding: 10px 24px; font-size: 0.88rem; font-weight: 600; border-radius: 9999px; border: 1px solid #d32f2f; color: #d32f2f; background: transparent; cursor: pointer; transition: all 0.2s;"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/src/pages/profile.ts"></script>
+  </body>
+</html>

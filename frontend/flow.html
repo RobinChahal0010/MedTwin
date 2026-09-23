@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Flow — MedTwin</title>
+    <meta name="description" content="Live telemetry visualizing MedTwin's 6-stage clinical reasoning pipeline." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-container">
+        <!-- Page Header -->
+        <div style="margin-bottom: 26px;">
+          <span class="eyebrow">LIVE MULTI-AGENT ARCHITECTURE</span>
+          <h1>Autonomous Clinical <em>Reasoning</em> Flow</h1>
+          <p style="margin-top: 6px; font-size: 1.05rem; max-width: 780px;">
+            Real-time SSE telemetry benchmarking your Type 2 Diabetes digital twin against ADA Standards of Care across a 6-stage autonomous verification pipeline.
+          </p>
+        </div>
+
+        <!-- Endpoint & Pipeline Verification Actions -->
+        <div class="card white" style="padding: 20px 24px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <div style="font-weight: 600; font-size: 1.05rem; color: var(--forest); margin-bottom: 2px;">Sequential Endpoint & Pipeline Verifier</div>
+            <div class="mute" style="font-size: 0.86rem;">Trigger real-time telemetry testing across all 6 agent reasoning and validation endpoints.</div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button type="button" id="flow-mode-toggle" class="chip" title="Toggle communication depth">
+              Mode: Patient
+            </button>
+            <button type="button" id="flow-run-btn" class="btn" style="padding: 10px 28px;">
+              Test Endpoints
+            </button>
+          </div>
+        </div>
+
+        <!-- 6-Circle Pipeline Visualization Card -->
+        <div class="card white" style="padding: 32px 24px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <span class="eyebrow" style="margin-bottom: 2px;">REAL-TIME TELEMETRY</span>
+              <h2 style="font-size: 1.4rem;">6-Stage Sequential Audit Chain</h2>
+            </div>
+            <div id="flow-status-pill" class="badge" style="font-size: 0.8rem; background: var(--input-bg); color: var(--forest); border: 1px solid var(--border);">
+              System Idle
+            </div>
+          </div>
+
+          <!-- 6-Circles Track in exact order: scope, twin, knowledge, simulate, answer, verify -->
+          <div class="flow-track-wrapper">
+            <div id="flow-track" class="flow-track">
+
+              <!-- 1. scope -->
+              <div class="flow-node-col">
+                <div id="scope" class="flow-circle idle" data-agent="scope" title="Agent 1: Scope & Safety Guard">
+                  <span class="circle-num">1</span>
+                </div>
+                <div class="flow-agent-label">Scope Guard</div>
+                <div id="status-scope" class="flow-agent-status">Idle</div>
+              </div>
+
+              <!-- Connector 1 -> 2 -->
+              <div id="line-scope-twin" class="flow-connector" data-from="scope" data-to="twin">
+                <div class="connector-arrow">▶</div>
+              </div>
+
+              <!-- 2. twin -->
+              <div class="flow-node-col">
+                <div id="twin" class="flow-circle idle" data-agent="twin" title="Agent 2: Digital Twin Profile">
+                  <span class="circle-num">2</span>
+                </div>
+                <div class="flow-agent-label">Digital Twin</div>
+                <div id="status-twin" class="flow-agent-status">Idle</div>
+              </div>
+
+              <!-- Connector 2 -> 3 -->
+              <div id="line-twin-knowledge" class="flow-connector" data-from="twin" data-to="knowledge">
+                <div class="connector-arrow">▶</div>
+              </div>
+
+              <!-- 3. knowledge -->
+              <div class="flow-node-col">
+                <div id="knowledge" class="flow-circle idle" data-agent="knowledge" title="Agent 3: Clinical Guidelines RAG">
+                  <span class="circle-num">3</span>
+                </div>
+                <div class="flow-agent-label">Knowledge (RAG)</div>
+                <div id="status-knowledge" class="flow-agent-status">Idle</div>
+              </div>
+
+              <!-- Connector 3 -> 4 -->
+              <div id="line-knowledge-simulate" class="flow-connector" data-from="knowledge" data-to="simulate">
+                <div class="connector-arrow">▶</div>
+              </div>
+
+              <!-- 4. simulate -->
+              <div class="flow-node-col">
+                <div id="simulate" class="flow-circle idle" data-agent="simulate" title="Agent 4: Counterfactual Simulation">
+                  <span class="circle-num">4</span>
+                </div>
+                <div class="flow-agent-label">What-If Sim</div>
+                <div id="status-simulate" class="flow-agent-status">Idle</div>
+              </div>
+
+              <!-- Connector 4 -> 5 -->
+              <div id="line-simulate-answer" class="flow-connector" data-from="simulate" data-to="answer">
+                <div class="connector-arrow">▶</div>
+              </div>
+
+              <!-- 5. answer -->
+              <div class="flow-node-col">
+                <div id="answer" class="flow-circle idle" data-agent="answer" title="Agent 5: Guideline Answer Writer">
+                  <span class="circle-num">5</span>
+                </div>
+                <div class="flow-agent-label">Answer Writer</div>
+                <div id="status-answer" class="flow-agent-status">Idle</div>
+              </div>
+
+              <!-- Connector 5 -> 6 -->
+              <div id="line-answer-verify" class="flow-connector" data-from="answer" data-to="verify">
+                <div class="connector-arrow">▶</div>
+              </div>
+
+              <!-- 6. verify -->
+              <div class="flow-node-col">
+                <div id="verify" class="flow-circle idle" data-agent="verify" title="Agent 6: Accuracy & Citation Verifier">
+                  <span class="circle-num">6</span>
+                </div>
+                <div class="flow-agent-label">Verifier</div>
+                <div id="status-verify" class="flow-agent-status">Idle</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Error Alert Banner -->
+          <div id="flow-error" style="display: none; margin-top: 24px; padding: 14px 18px; background: #fef2f2; border: 1px solid #f87171; border-radius: 10px; color: #991b1b; font-size: 0.92rem;">
+            <!-- Rendered on error -->
+          </div>
+        </div>
+
+        <!-- Result Box Below Diagram -->
+        <div id="flow-result-box" class="card white" style="display: none; padding: 26px; margin-bottom: 30px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="eyebrow" style="margin-bottom: 0;">SYNTHESIZED CLINICAL RESPONSE</span>
+              <span id="flow-result-mode-badge" class="badge" style="font-size: 0.76rem;">Patient Mode</span>
+            </div>
+            <div id="flow-confidence-badge" class="badge ok" style="font-size: 0.82rem;">
+              Confidence: 94%
+            </div>
+          </div>
+
+          <!-- Text content -->
+          <div id="flow-result-content" class="assistant-text" style="font-size: 0.98rem; line-height: 1.65; color: var(--forest);">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Sources Accordion -->
+          <div id="flow-sources-container" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <script type="module" src="/src/pages/flow.ts"></script>
+  </body>
+</html>

@@ -1,5 +1,158 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My numbers</title><link rel="stylesheet" href="css/style.css"></head><body>
-<main><h1 style="font-size:clamp(2rem,5vw,3rem)">Your numbers</h1><p class="mute">Step 1 of 2. Take the numbers from your lab report. Sample numbers are already filled in.</p>
-<div class="drop" id="dz" style="margin:22px 0"><p>📄 Have a report? Drop it here or <label style="color:var(--g2);text-decoration:underline">choose a file<input id="fi" type="file" hidden></label></p><p class="mute" id="fn"></p></div>
-<form id="f" class="card"><div class="grid" id="fields"></div><br><button class="btn">See my health picture →</button></form></main>
-<script src="js/api.js"></script><script src="js/cursor.js"></script><script src="js/ui.js"></script><script src="js/upload.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Health Markers — MedTwin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-container">
+        <div style="margin-bottom: 28px;">
+          <span class="eyebrow">BIOMARKER INGESTION</span>
+          <h1>Add <em>Your</em> Health Numbers</h1>
+          <p style="margin-top: 6px; font-size: 1.05rem;">
+            Attach an official lab document or provide your 10 key Type 2 Diabetes biomarkers directly to synthesize your personalized digital twin.
+          </p>
+        </div>
+
+        <!-- Dropzone Section: Method A -->
+        <div class="card" style="margin-bottom: 24px;">
+          <span class="eyebrow">DOCUMENT INGESTION</span>
+          <h3 style="margin-bottom: 12px;">Method A: Upload Lab Report Document</h3>
+          
+          <div class="drop" id="drop-zone">
+            <div class="drop-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+              </svg>
+            </div>
+            <p style="font-size: 1rem; font-weight: 600; color: var(--forest); margin-bottom: 4px;">
+              Drag & drop lab report (PDF, image, or CSV) here
+            </p>
+            <p class="mute" style="font-size: 0.88rem; margin-bottom: 14px;">or click anywhere to browse local files</p>
+            <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.csv" hidden />
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+              <span id="file-name-display" class="mute" style="font-size: 0.86rem;">No file selected. Manual entry below will be compiled as CSV.</span>
+              <button type="button" id="clear-file-btn" class="chip" style="display: none; padding: 3px 10px; font-size: 0.78rem;">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual Entry Section: Method B (10 inputs) -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <span class="eyebrow">DIRECT NUMERIC INPUT</span>
+              <h3>Method B: Manual Biomarker Entry</h3>
+            </div>
+            <button type="button" id="sample-preset-btn" class="chip" style="font-size: 0.82rem;">
+              Fill Sample Values
+            </button>
+          </div>
+          <p class="mute" style="font-size: 0.9rem; margin-bottom: 24px;">
+            If no document is uploaded above, MedTwin compiles these 10 core clinical metrics to generate your digital twin.
+          </p>
+
+          <form id="twin-upload-form">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px;">
+              <!-- 1. age (number, years) -->
+              <div>
+                <label for="age">1. Age</label>
+                <input id="age" name="age" type="number" step="1" min="1" max="120" value="58" required />
+                <span class="hint">Patient age in years</span>
+              </div>
+
+              <!-- 2. sex (select: 1=Male, 2=Female) -->
+              <div>
+                <label for="sex">2. Sex</label>
+                <select id="sex" name="sex" required>
+                  <option value="1" selected>1 = Male</option>
+                  <option value="2">2 = Female</option>
+                </select>
+                <span class="hint">Biological sex classifier</span>
+              </div>
+
+              <!-- 3. bmi (number) -->
+              <div>
+                <label for="bmi">3. BMI</label>
+                <input id="bmi" name="bmi" type="number" step="0.1" min="10" max="80" value="31.4" required />
+                <span class="hint">Body mass index (kg/m²)</span>
+              </div>
+
+              <!-- 4. sbp (number, mmHg) -->
+              <div>
+                <label for="sbp">4. Systolic Blood Pressure</label>
+                <input id="sbp" name="sbp" type="number" step="1" min="50" max="260" value="142" required />
+                <span class="hint">Top blood pressure number (mmHg)</span>
+              </div>
+
+              <!-- 5. dbp (number, mmHg) -->
+              <div>
+                <label for="dbp">5. Diastolic Blood Pressure</label>
+                <input id="dbp" name="dbp" type="number" step="1" min="30" max="160" value="84" required />
+                <span class="hint">Bottom blood pressure number (mmHg)</span>
+              </div>
+
+              <!-- 6. total_chol (number, mg/dL) -->
+              <div>
+                <label for="total_chol">6. Total Cholesterol</label>
+                <input id="total_chol" name="total_chol" type="number" step="1" min="50" max="600" value="198" required />
+                <span class="hint">Fasting total cholesterol (mg/dL)</span>
+              </div>
+
+              <!-- 7. hdl (number, mg/dL) -->
+              <div>
+                <label for="hdl">7. HDL Cholesterol</label>
+                <input id="hdl" name="hdl" type="number" step="1" min="10" max="150" value="38" required />
+                <span class="hint">High-density lipoprotein (mg/dL)</span>
+              </div>
+
+              <!-- 8. creatinine (number, mg/dL) -->
+              <div>
+                <label for="creatinine">8. Serum Creatinine</label>
+                <input id="creatinine" name="creatinine" type="number" step="0.05" min="0.2" max="15" value="1.0" required />
+                <span class="hint">Kidney filtration biomarker (mg/dL)</span>
+              </div>
+
+              <!-- 9. hba1c (number, %) -->
+              <div>
+                <label for="hba1c">9. HbA1c</label>
+                <input id="hba1c" name="hba1c" type="number" step="0.1" min="3" max="20" value="7.9" required />
+                <span class="hint">3-month glucose average (%)</span>
+              </div>
+
+              <!-- 10. insulin (select: 0=No, 1=Yes) -->
+              <div>
+                <label for="insulin">10. Insulin Therapy</label>
+                <select id="insulin" name="insulin" required>
+                  <option value="0" selected>0 = No</option>
+                  <option value="1">1 = Yes</option>
+                </select>
+                <span class="hint">Current active insulin medication</span>
+              </div>
+            </div>
+
+            <!-- Upload Feedback Message -->
+            <div id="upload-status" style="display: none; padding: 14px 18px; border-radius: 12px; margin-top: 20px; font-size: 0.92rem;"></div>
+
+            <div style="margin-top: 26px;">
+              <button type="submit" id="submit-upload-btn" class="btn wide">
+                See my health picture
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/src/pages/upload.ts"></script>
+  </body>
+</html>

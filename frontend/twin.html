@@ -1,7 +1,106 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My health</title><link rel="stylesheet" href="css/style.css"></head><body>
-<main><h1 style="font-size:clamp(2rem,5vw,3rem)">Your health picture</h1><p class="mute">Green = on target. Orange = a good thing to talk about with your doctor.</p>
-<div class="grid" style="grid-template-columns:minmax(260px,340px) 1fr;margin-top:22px">
-<div class="card" style="text-align:center"><svg viewBox="0 0 120 120" width="210"><circle cx="60" cy="60" r="52" fill="none" stroke="#dff1e4" stroke-width="10"/><circle id="arc" cx="60" cy="60" r="52" fill="none" stroke="#2f9e6e" stroke-width="10" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="327" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1)"/></svg>
-<div class="big" style="margin-top:-125px;margin-bottom:75px"><span id="r">0</span>%</div><p class="mute">Chance your sugar is above the usual goal. This is an estimate from many people’s data, not a diagnosis.</p><br><a class="btn" href="chat.html">Ask a question</a></div>
-<div class="grid" id="vals"></div></div></main>
-<script src="js/api.js"></script><script src="js/cursor.js"></script><script src="js/ui.js"></script><script src="js/twin.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Twin Dashboard — MedTwin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <span class="eyebrow">DIGITAL TWIN PROFILE</span>
+            <h1>Your Health <em>Picture</em></h1>
+            <p style="margin-top: 6px; font-size: 1.05rem;">
+              Read-only digital twin model derived from validated Type 2 Diabetes biomarkers and clinical guidelines.
+            </p>
+          </div>
+          <div>
+            <a href="chat.html" class="btn">Ask a question</a>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="card" style="min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px;">
+          <span class="eyebrow">FETCHING BIOMARKERS</span>
+          <h3 style="margin-bottom: 8px;">Retrieving Your Digital Twin...</h3>
+          <p class="mute" style="font-size: 0.9rem;">Fetching endpoint GET /twin/{user_id} and clinical status tags.</p>
+        </div>
+
+        <!-- Error / Empty State -->
+        <div id="error-state" class="card" style="display: none; min-height: 320px; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+          <span class="eyebrow">RECORD NOT FOUND</span>
+          <h3 style="margin-bottom: 8px;">No Health Record Found</h3>
+          <p id="error-message" class="mute" style="max-width: 500px; margin-bottom: 24px; font-size: 0.94rem;">
+            No digital twin was found for your account. Please upload a report or enter your 10 biomarkers.
+          </p>
+          <a href="upload.html" class="btn">Upload Your Numbers Now</a>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content" style="display: none;">
+          <!-- Top Summary Banner: ML Risk Score Gauge & Action Call -->
+          <div class="twin-summary-card">
+            <div style="display: flex; justify-content: space-around; align-items: center; gap: 36px; flex-wrap: wrap;">
+              <!-- Circular SVG Risk Gauge -->
+              <div style="text-align: center; position: relative;">
+                <svg viewBox="0 0 120 120" width="180" height="180">
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="#d5dfcd" stroke-width="10" />
+                  <circle
+                    id="risk-gauge-arc"
+                    cx="60"
+                    cy="60"
+                    r="52"
+                    fill="none"
+                    stroke="#21311b"
+                    stroke-width="10"
+                    stroke-linecap="round"
+                    stroke-dasharray="327"
+                    stroke-dashoffset="327"
+                    transform="rotate(-90 60 60)"
+                    style="transition: stroke-dashoffset 1.4s ease;"
+                  />
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                  <div class="big" style="line-height: 1;"><span id="risk-percent-number">0</span>%</div>
+                  <div class="mute" style="font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px;">
+                    Model Risk
+                  </div>
+                </div>
+              </div>
+
+              <!-- Risk Explanation & Action -->
+              <div style="max-width: 520px;">
+                <span class="eyebrow">RISK ESTIMATOR</span>
+                <h3 style="margin-bottom: 8px;">Type 2 Diabetes Stability Projection</h3>
+                <p class="mute" style="line-height: 1.6; font-size: 0.94rem; margin-bottom: 20px;">
+                  Estimated probability of blood glucose exceeding guideline targets over 6–12 months if current regimen remains unchanged. Derived via trained Random Forest estimators.
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <a href="chat.html" class="btn">Ask a question</a>
+                  <a href="upload.html" class="btn secondary">Re-upload Lab Numbers</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Biomarker Values Grid: One card per field in values -->
+          <div style="margin-bottom: 20px;">
+            <span class="eyebrow">CLINICAL PARAMETERS</span>
+            <h2>Individual Type 2 Diabetes Indicators</h2>
+          </div>
+          <div id="values-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+            <!-- Populated dynamically: one card per field -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/src/pages/twin.ts"></script>
+  </body>
+</html>
